@@ -1622,7 +1622,7 @@ Backoff.prototype.setJitter = function (jitter) {
 
 /***/ "./node_modules/base64-arraybuffer/lib/base64-arraybuffer.js":
 /*!*******************************************************************!*\
-  !*** ./node_modules/base64-arraybuffer/lib/base64-arraybuffer.js ***!
+  !*** ./node_modules/base64-arraybuffer/common/base64-arraybuffer.js ***!
   \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
@@ -2392,7 +2392,7 @@ module.exports = setup;
 
 /***/ "./node_modules/engine.io-client/lib/globalThis.browser.js":
 /*!*****************************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/globalThis.browser.js ***!
+  !*** ./node_modules/engine.io-client/common/globalThis.browser.js ***!
   \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
@@ -2411,7 +2411,7 @@ module.exports = function () {
 
 /***/ "./node_modules/engine.io-client/lib/index.js":
 /*!****************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/index.js ***!
+  !*** ./node_modules/engine.io-client/common/index.js ***!
   \****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -2438,7 +2438,7 @@ module.exports.parser = __webpack_require__(/*! engine.io-parser */ "./node_modu
 
 /***/ "./node_modules/engine.io-client/lib/socket.js":
 /*!*****************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/socket.js ***!
+  !*** ./node_modules/engine.io-client/common/socket.js ***!
   \*****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -3127,7 +3127,7 @@ module.exports = Socket;
 
 /***/ "./node_modules/engine.io-client/lib/transport.js":
 /*!********************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/transport.js ***!
+  !*** ./node_modules/engine.io-client/common/transport.js ***!
   \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -3305,7 +3305,7 @@ module.exports = Transport;
 
 /***/ "./node_modules/engine.io-client/lib/transports/index.js":
 /*!***************************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/transports/index.js ***!
+  !*** ./node_modules/engine.io-client/common/transports/index.js ***!
   \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -3361,7 +3361,7 @@ function polling(opts) {
 
 /***/ "./node_modules/engine.io-client/lib/transports/polling-jsonp.js":
 /*!***********************************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/transports/polling-jsonp.js ***!
+  !*** ./node_modules/engine.io-client/common/transports/polling-jsonp.js ***!
   \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -3622,7 +3622,7 @@ module.exports = JSONPPolling;
 
 /***/ "./node_modules/engine.io-client/lib/transports/polling-xhr.js":
 /*!*********************************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/transports/polling-xhr.js ***!
+  !*** ./node_modules/engine.io-client/common/transports/polling-xhr.js ***!
   \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -4044,7 +4044,7 @@ module.exports.Request = Request;
 
 /***/ "./node_modules/engine.io-client/lib/transports/polling.js":
 /*!*****************************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/transports/polling.js ***!
+  !*** ./node_modules/engine.io-client/common/transports/polling.js ***!
   \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -4309,7 +4309,7 @@ module.exports = Polling;
 
 /***/ "./node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js":
 /*!***************************************************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js ***!
+  !*** ./node_modules/engine.io-client/common/transports/websocket-constructor.browser.js ***!
   \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -4326,7 +4326,7 @@ module.exports = {
 
 /***/ "./node_modules/engine.io-client/lib/transports/websocket.js":
 /*!*******************************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/transports/websocket.js ***!
+  !*** ./node_modules/engine.io-client/common/transports/websocket.js ***!
   \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -4615,7 +4615,7 @@ module.exports = WS;
 
 /***/ "./node_modules/engine.io-client/lib/util.js":
 /*!***************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/util.js ***!
+  !*** ./node_modules/engine.io-client/common/util.js ***!
   \***************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
@@ -4635,7 +4635,7 @@ module.exports.pick = function (obj) {
 
 /***/ "./node_modules/engine.io-client/lib/xmlhttprequest.js":
 /*!*************************************************************!*\
-  !*** ./node_modules/engine.io-client/lib/xmlhttprequest.js ***!
+  !*** ./node_modules/engine.io-client/common/xmlhttprequest.js ***!
   \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -4680,7 +4680,7 @@ module.exports = function (opts) {
 
 /***/ "./node_modules/engine.io-parser/lib/commons.js":
 /*!******************************************************!*\
-  !*** ./node_modules/engine.io-parser/lib/commons.js ***!
+  !*** ./node_modules/engine.io-parser/common/commons.js ***!
   \******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
@@ -4712,7 +4712,7 @@ module.exports = {
 
 /***/ "./node_modules/engine.io-parser/lib/decodePacket.browser.js":
 /*!*******************************************************************!*\
-  !*** ./node_modules/engine.io-parser/lib/decodePacket.browser.js ***!
+  !*** ./node_modules/engine.io-parser/common/decodePacket.browser.js ***!
   \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -4789,7 +4789,7 @@ module.exports = decodePacket;
 
 /***/ "./node_modules/engine.io-parser/lib/encodePacket.browser.js":
 /*!*******************************************************************!*\
-  !*** ./node_modules/engine.io-parser/lib/encodePacket.browser.js ***!
+  !*** ./node_modules/engine.io-parser/common/encodePacket.browser.js ***!
   \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -4843,7 +4843,7 @@ module.exports = encodePacket;
 
 /***/ "./node_modules/engine.io-parser/lib/index.js":
 /*!****************************************************!*\
-  !*** ./node_modules/engine.io-parser/lib/index.js ***!
+  !*** ./node_modules/engine.io-parser/common/index.js ***!
   \****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
