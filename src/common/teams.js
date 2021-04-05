@@ -1,4 +1,4 @@
 export const teams = {
     WHITE: "WHITE",
-    BLACK: "WHITE"
+    BLACK: "BLACK"
 }

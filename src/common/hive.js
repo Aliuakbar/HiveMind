@@ -4,31 +4,32 @@ import {Hex} from "./hexlib.js"
 
 
 export class Hive {
-    constructor(map = {}) {
-        this.map = map
+    constructor() {
+        this.map = new Map()
     }
     at(hex) {
-        return this.map[hex][-1]
+        const ar = this.map.get(hex)
+        return ar[ar.length - 1]
     }
 
     removeStone(hex) {
-        this.map[hex].pop()
-        if (!this.map[hex].length) {
-            delete this.map[hex]
+        this.map.get(hex).pop()
+        if (!this.map.get(hex).length) {
+            delete this.map.get(hex)
         }
     }
 
     addStone(hex, stone){
-        this.root = stone
-        if (!(hex in this.map)) this.map[hex] = [stone]
-        else this.map[hex].push(stone)
+        this.root = hex
+        if (!this.map.has(hex)) this.map.set(hex, [stone])
+        else this.map.get(hex).push(stone)
     }
 
     gameResult() {
         let whiteLost = false
         let blackLost = false
-        for (const hex in this.map) {
-            const stone = this.map[hex][0]
+        for (const hex of this.map.keys()) {
+            const stone = this.map.get(hex)[0]
             if (stone.insect === insects.BEE) {
                 if (this.neighbors(hex).length === 6) {
                     if (stone.team === teams.WHITE) whiteLost = true
@@ -42,134 +43,151 @@ export class Hive {
     }
 
     neighbors(hex) {
-        return [...hex.neighbors()].filter(n => n in this.map)
+        return [...hex.neighbors()].filter(n => this.map.has(n))
     }
     height(hex) {
-        return this.map[hex].length
+        if (this.map.has(hex)) return this.map.get(hex).length
+        return 0
     }
-    *generateSingleWalks(hex, ignore=null) {
-        for ([a, b, c] of hex.circleIterator) {
-            if (b in this.map) continue
+    generateSingleWalks(hex, ignore=null) {
+        let result = []
+        for (const [a, b, c] of hex.circleIterator()) {
+            if (this.map.has(b)) continue
             if (ignore === null) {
-                if ((a in this.map) ^ (c in this.map)) yield b
+                if (this.map.has(a) ^ this.map.has(c)) result.push(b)
             } else {
-                if ((a in this.map) && (a!==ignore) ^ (c in this.map && c!==ignore)) yield b
+                // ignore was probably not working because object comparison
+                if (this.map.has(a) && (a.compare(ignore)) ^ (this.map.has(c) && c.compare(ignore))) result.push(b)
             }
         }
+        return result
     }
-
-    *generateWalks(hex, target) {
+    generateWalks(hex, target=-1) {
         let visited = new Set()
-        let distance = {}
+        let distance = new Map()
         let queue = []
+        let result = []
         queue.push(hex)
-        distance[hex] = 0
+        distance.set(hex, 0)
         visited.add(hex)
         while (queue.length) {
             let vertex = queue.shift()
             visited.add(vertex)
-            if (target === undefined && vertex !== hex) yield vertex
+            if (target === -1 && vertex !== hex) result.push(vertex)
             else {
-                let d = distance[vertex]
+                let d = distance.get(vertex)
                 if (d > target) continue
-                if (d === target) yield vertex
+                if (d === target) result.push(vertex)
             }
-            for (let n of this.generateSingleWalks(vertex, hex)) {
+            for (const n of this.generateSingleWalks(vertex, hex)) {
                 if (visited.has(n)) continue
-                distance[n] = distance[vertex] + 1
+                distance.set(n, distance.get(vertex) + 1)
                 queue.push(n)
             }
         }
+        return result
     }
-    *generateSpiderWalks(hex) {
+    generateSpiderWalks(hex) {
         return this.generateWalks(hex, 3)
     }
-    
-    *generateJumps(hex) {
-        for (const d of Hex.directions) {
-            let offset = new Hex(...d)
-            if (hex.add(offset) in this.map) {
+    generateJumps(hex) {
+        let result = []
+        for (const offset of Hex.directions) {
+            if (this.map.has(hex.add(offset))) {
                 let i = 2
-                while (hex.add(offset.scale(i)) in this.map) i++
-                yield hex.add(offset.scale(i))
+                while (this.map.has(hex.add(offset.scale(i)))) i++
+                result.push(hex.add(offset.scale(i)))
             }
         }
+        return result
     }
-    *generateClimbs(hex) {
+    generateClimbs(hex) {
+        let result = []
         let hh = this.height(hex)
         if (hh > 1) {
             for ([a, b, c] of hex.circleIterator()){
                 if (this.height(b) < hh) {
-                    if ((this.height(a) < hh) || (this.height(c) < hh)) yield b
+                    if ((this.height(a) < hh) || (this.height(c) < hh)) result.push(b)
                 }
             }
-        } else for (const i of this.generateSingleWalks()) yield i
-        for ([a, b, c] of hex.circleIterator()) {
-            let ha = this.height(b)
+        } else result.concat(this.generateSingleWalks(hex))
+        for (const [a, b, c] of hex.circleIterator()) {
+            let ha = this.height(a)
             let hb = this.height(b)
             let hc = this.height(c)
-            if ((hb >= hh) && !(ha > hh && hc > hh)) yield b
+            if ((hb >= hh) && !(ha > hh && hc > hh)) result.push(b)
         }
+        return result
     }
+
     _checkNeighborTeam(hex, team) {
         return this.neighbors(hex).every(n => this.at(n).team === team)
     }
     generateDrops(team) {
         let candidates = new Set()
-        for (const node in this.map) {
-            [...node.neighbors()]
-                .filter(e => ! e in this.map)
+        for (const hex of this.map.keys()) {
+            [... hex.neighbors()]
+                .filter(e => !this.map.has(e))
                 .forEach(e => candidates.add(e))
         }
         return [...candidates].filter(e => this._checkNeighborTeam(e, team))
     }
 
     _oneHive() {
-        let lowlink = {}
+        let lowLink = new Map()
         let visited = new Set()
-        let index = {}
+        let index = new Map()
         let articulation_points = new Set()
         let dfs = (node, parent, counter) => {
             visited.add(node)
             counter++
-            index[node] = counter
-            lowlink[node] = counter
+            index.set(node, counter)
+            lowLink.set(node, counter)
             let children = 0
-            for (n of this.neighbors) {
+            for (const n of this.neighbors(node)) {
                 if (n === parent) continue
-                if (visited.has(n)) lowlink[node] = Math.min(lowlink[node], index[n])
+                if (visited.has(n)) lowLink.set(node, Math.min(lowLink.get(node), index.get(n)))
                 else {
                     dfs(n, node, counter)
-                    lowlink[node] = Math.min(lowlink[node], lowlink[n])
-                    if (lowlink[n] >= index[node] && parent !== null) articulation_points.add(node)
+                    lowLink.set(node, Math.min(lowLink.get(node), lowLink.get(n)))
+                    if (lowLink.get(n) >= index.get(node) && parent !== null) articulation_points.add(node)
                     children++
                 }
             }
             if (parent === null && children >= 2) articulation_points.add(node)
         }
-        if (this.root !== undefined) dfs(this.root, null, 0)
+        // Need call because otherwise this is not bound in the nested function>
+        if (this.root !== undefined) dfs.call(this, this.root, null, 0)
         return articulation_points
     }
 
-    *_generateMovesFrom(hex) {
+    generateMovesFrom(hex) {
         // insects.BEE ... instead of 0 ... causes error. Why?
         const moveMap = {
-            0: this.generateSingleWalks,
-            1: this.generateSpiderWalks,
-            2: this.generateWalks,
-            3: this.generateJumps,
-            4: this.generateClimbs
+            BEE: this.generateSingleWalks,
+            SPIDER: this.generateSpiderWalks,
+            ANT: this.generateWalks,
+            GRASSHOPPER: this.generateJumps,
+            BEETLE: this.generateClimbs
         }
-        for (const i of [...moveMap[this.at(hex).insect](hex)]) yield i
+        console.log(this.at(hex).insect)
+        console.log(moveMap[this.at(hex).insect].call(this, hex))
+        return moveMap[this.at(hex).insect].call(this, hex)
     }
 
-    *generateMoves(team) {
+    generateMoves(team) {
+        let result = []
         const articulation_points = this._oneHive()
-        let starts = this.map
-            .filter(hex => this.at(hex).team === team)
-            .filter(e => this.height(hex) > 1 || !articulation_points.has(e))
-        for (const hex of starts) {
-            for (const dest of this._generateMovesFrom(hex)) yield [hex, dest]
+        for (const hex of this.map.keys()) {
+            if (this.at(hex).team === team) {
+                if (this.height(hex) > 1 || !articulation_points.has(hex)) {
+                    for (const dest of this.generateMovesFrom(hex)) {
+                        console.log([hex, dest])
+                        result.push([hex, dest])
+                    }
+                }
+            }
         }
+        return result
     }
 }

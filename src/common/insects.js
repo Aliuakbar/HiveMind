@@ -1,7 +1,7 @@
 export const insects = {
-    "BEE": 1,
-    "SPIDER": 2,
-    "ANT": 3,
-    "GRASSHOPPER": 4,
-    "BEETLE": 5
+    BEE: "BEE",
+    SPIDER: "SPIDER",
+    ANT: "ANT",
+    GRASSHOPPER: "GRASSHOPPER",
+    BEETLE: "BEETLE"
 }

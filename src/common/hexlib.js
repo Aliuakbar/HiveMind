@@ -13,6 +13,9 @@ export class Hex {
         if (Math.round(this.q + this.r + this.s) !== 0)
             throw "q + r + s must be 0";
     }
+    compare(other) {
+        return this.q === other.q && this.r === other.r
+    }
     add(b) {
         return new Hex(this.q + b.q, this.r + b.r, this.s + b.s);
     }
@@ -83,7 +86,7 @@ export class Hex {
     * circleIterator() {
         let neighbors = [...this.neighbors()]
         for (let i=0;i<6;i++) {
-            yield [neighbors[i], neighbors[(i+1)%6], neighbors[(i+1)%6]];
+            yield [neighbors[i], neighbors[(i+1)%6], neighbors[(i+2)%6]];
         }
     }
 }
@@ -95,6 +98,7 @@ Hex.directions = [
     new Hex(-1, 1, 0),
     new Hex(0, 1, -1)
 ];
+export const directions = Hex.directions
 Hex.diagonals = [
     new Hex(2, -1, -1),
     new Hex(1, -2, 1),
