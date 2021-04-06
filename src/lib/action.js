@@ -7,4 +7,4 @@ export function Drop(stone, destination) {
     this.stone = stone
     this.destination = destination
 }
-export const Pass = {}
+export const Pass = "PASS"

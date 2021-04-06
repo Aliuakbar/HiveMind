@@ -2,9 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HiveMind</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Ali Gottschall">
+    <title> HiveMind </title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link type="text/css" rel="stylesheet" href="'style.css"\>
 </head>
-<body>
 
+<body>
+    <header>
+        <h1>HiveMind</h1>
+    </header>
+
+    <section class="content">
+        
+        <div id="controls">
+    <form id="test" method="POST" action='#'>
+        <input type="submit" value="Test Move">
+    </form>
+    <form id="automove" method="POST" action='#'>
+        <input type="submit" value="AutoMove">
+    </form>
+    <form id="resetgame" method="POST" action='#'>
+        <input type="submit" value="Reset">
+    </form>
+    </div>
+<canvas id='c'></canvas>
+    </section>
+
+ <!-- <script src="libs/jquery-2.0.2.min.js"></script> -->
+
+    <!-- FastClick is used to eliminate the 300ms delay when clicking items on a mobile device
+        https://github.com/ftlabs/fastclick -->
+
+    <!-- If Socket.IO is used with Express, then the /socket.io/ path will
+        serve the proper Socket.IO javascript files used by the browser -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- app.js is where all the client-side Anagrammatix game logic -->
+    <script src="./app.js"></script>   
 </body>
 </html>

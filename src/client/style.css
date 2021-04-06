@@ -1,0 +1,11 @@
+body {
+    background: rgb(0, 43, 54);
+    color: rgb(253, 246, 227);
+}
+
+#c {
+     margin: 0;
+     width: 100%;
+     height: 100%;
+     display: block;
+}

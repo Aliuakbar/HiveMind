@@ -2,6 +2,7 @@ import {insects} from "./insects.js"
 import {Stone} from "./stone.js"
 import {teams} from "./teams.js"
 import {Hex} from "./hexlib.js"
+import * as HEX from "./hexlib_.js"
 import {Move, Drop, Pass} from "./action.js"
 import {Hive} from "./hive.js"
 
@@ -43,22 +44,31 @@ export class State {
         return this._beeMove.get(this.team)
     }
     _getActions() {
+        console.log("Generating actions")
         let opts = []
         const dropStones = this.stones.filter(stone => stone.team === this.team)
             .map(i => JSON.stringify(i))
             .filter((s, i, r) => r.indexOf(s) === i)
             .map(i => JSON.parse(i))
             .map(({insect, team}) => new Stone(insect, team))
-        if (this.turnNumber === 0) return dropStones.map(stone => new Drop(stone, new Hex(0, 0)))
-        else if (this.turnNumber === 1) return dropStones.map(stone => new Drop(stone, new Hex(0, -1)))
+        if (this.turnNumber === 0) {
+          console.log("First move")
+          return dropStones.map(stone => new Drop(stone, HEX.Hex(0, 0)))
+        }
+        else if (this.turnNumber === 1) {
+          console.log("Second move")
+          return dropStones.map(stone => new Drop(stone, HEX.Hex(0, -1)))
+        }
         else if (this.turnNumber >= 6 && !this.moveAllowed) {
-            [...this.hive.generateDrops(this.team)].forEach(d => opts.push(new Drop(new Stone(insects.BEE, this.team), d)))
+            console.log("Forced bee drop")
+            this.hive.generateDrops(this.team).forEach(d => opts.push(new Drop(new Stone(insects.BEE, this.team), d)))
         } else {
             if (dropStones.length) {
-                [...this.hive.generateDrops(this.team)].forEach(d => dropStones.forEach(ds => opts.push(new Drop(ds, d))))
+                console.log("Drops allowed")
+                this.hive.generateDrops(this.team).forEach(d => dropStones.forEach(ds => opts.push(new Drop(ds, d))))
             }
-            // TODO generate drops probably gives to many
             if (this.moveAllowed) {
+                console.log("Moves allowed")
                 this.hive.generateMoves(this.team).forEach(([origin, dest]) => {
                     opts.push(new Move(origin, dest))
                 })
@@ -96,7 +106,11 @@ export class State {
             }
             // Remove the dropped stone from the availables and add it to the hive
             // TODO the stone is not removed because objects do not compare equal for values
-            this.stones.splice(this.stones.indexOf(stone), 1)
+            let index
+            this.stones.forEach((s, i) => {
+              if (JSON.stringify(s) === JSON.stringify(stone)) index = i
+            })
+            this.stones.splice(index, 1)
             this.hive.addStone(action.destination, stone)
         }
         delete this._actions

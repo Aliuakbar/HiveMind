@@ -1,11 +1,13 @@
 import {insects} from "./insects.js"
 import {teams} from "./teams.js"
 import {Hex} from "./hexlib.js"
+import * as HEX from "./hexlib_.js"
+import {HashMap, HashSet} from "./hashmap.js"
 
 
 export class Hive {
     constructor() {
-        this.map = new Map()
+        this.map = new HashMap()
     }
     at(hex) {
         const ar = this.map.get(hex)
@@ -13,13 +15,15 @@ export class Hive {
     }
 
     removeStone(hex) {
+        console.log("Removing stone")
         this.map.get(hex).pop()
         if (!this.map.get(hex).length) {
-            delete this.map.get(hex)
+            this.map.delete(hex)
         }
     }
 
-    addStone(hex, stone){
+    addStone(hex, stone) {
+        console.log("Adding stone")
         this.root = hex
         if (!this.map.has(hex)) this.map.set(hex, [stone])
         else this.map.get(hex).push(stone)
@@ -43,7 +47,7 @@ export class Hive {
     }
 
     neighbors(hex) {
-        return [...hex.neighbors()].filter(n => this.map.has(n))
+        return HEX.hex_neighbors(hex).filter(n => this.map.has(n))
     }
     height(hex) {
         if (this.map.has(hex)) return this.map.get(hex).length
@@ -51,39 +55,41 @@ export class Hive {
     }
     generateSingleWalks(hex, ignore=null) {
         let result = []
-        for (const [a, b, c] of hex.circleIterator()) {
+        for (const [a, b, c] of HEX.hex_circle_iterator(hex)) {
             if (this.map.has(b)) continue
             if (ignore === null) {
                 if (this.map.has(a) ^ this.map.has(c)) result.push(b)
             } else {
                 // ignore was probably not working because object comparison
-                if (this.map.has(a) && (a.compare(ignore)) ^ (this.map.has(c) && c.compare(ignore))) result.push(b)
+                if ((this.map.has(a) && !HEX.hex_compare(a, ignore)) ^ (this.map.has(c) && !HEX.hex_compare(c, ignore))) {      result.push(b)
+                }
             }
         }
         return result
     }
-    generateWalks(hex, target=-1) {
-        let visited = new Set()
-        let distance = new Map()
+    generateWalks(start, target=-1) {
+        let visited = new HashSet()
+        let distance = new HashMap()
         let queue = []
         let result = []
-        queue.push(hex)
-        distance.set(hex, 0)
-        visited.add(hex)
+        queue.push(start)
+        distance.set(start, 0)
         while (queue.length) {
-            let vertex = queue.shift()
+            const vertex = queue.shift()
             visited.add(vertex)
-            if (target === -1 && vertex !== hex) result.push(vertex)
-            else {
-                let d = distance.get(vertex)
-                if (d > target) continue
-                if (d === target) result.push(vertex)
-            }
-            for (const n of this.generateSingleWalks(vertex, hex)) {
+            for (const n of this.generateSingleWalks(vertex, start)) {
                 if (visited.has(n)) continue
                 distance.set(n, distance.get(vertex) + 1)
                 queue.push(n)
             }
+            if (target == -1 && !HEX.hex_compare(vertex, start)) { 
+              result.push(vertex)
+            } else {
+                let d = distance.get(vertex)
+                if (d > target) continue
+                if (d === target) result.push(vertex)
+            }
+            
         }
         return result
     }
@@ -92,11 +98,11 @@ export class Hive {
     }
     generateJumps(hex) {
         let result = []
-        for (const offset of Hex.directions) {
-            if (this.map.has(hex.add(offset))) {
+        for (const offset of HEX.hex_directions) {
+            if (this.map.has(HEX.hex_add(hex, offset))) {
                 let i = 2
-                while (this.map.has(hex.add(offset.scale(i)))) i++
-                result.push(hex.add(offset.scale(i)))
+                while (this.map.has(HEX.hex_add(hex, HEX.hex_scale(offset,i)))) i++
+                result.push(HEX.hex_add(hex, HEX.hex_scale(offset,i)))
             }
         }
         return result
@@ -105,13 +111,13 @@ export class Hive {
         let result = []
         let hh = this.height(hex)
         if (hh > 1) {
-            for ([a, b, c] of hex.circleIterator()){
+            for (const [a, b, c] of HEX.hex_circle_iterator(hex)){
                 if (this.height(b) < hh) {
                     if ((this.height(a) < hh) || (this.height(c) < hh)) result.push(b)
                 }
             }
         } else result.concat(this.generateSingleWalks(hex))
-        for (const [a, b, c] of hex.circleIterator()) {
+        for (const [a, b, c] of HEX.hex_circle_iterator(hex)) {
             let ha = this.height(a)
             let hb = this.height(b)
             let hc = this.height(c)
@@ -124,20 +130,22 @@ export class Hive {
         return this.neighbors(hex).every(n => this.at(n).team === team)
     }
     generateDrops(team) {
-        let candidates = new Set()
+        console.log("Generating drops")
+        let candidates = new HashSet()
         for (const hex of this.map.keys()) {
-            [... hex.neighbors()]
-                .filter(e => !this.map.has(e))
-                .forEach(e => candidates.add(e))
+            HEX.hex_neighbors(hex)
+              .filter(e => !this.map.has(e))
+              .forEach(e => candidates.add(e))
         }
-        return [...candidates].filter(e => this._checkNeighborTeam(e, team))
+        // console.log(candidates)
+        return [...candidates.values()].filter(e => this._checkNeighborTeam(e, team))
     }
 
     _oneHive() {
-        let lowLink = new Map()
-        let visited = new Set()
-        let index = new Map()
-        let articulation_points = new Set()
+        let lowLink = new HashMap()
+        let visited = new HashSet()
+        let index = new HashMap()
+        let articulation_points = new HashSet()
         let dfs = (node, parent, counter) => {
             visited.add(node)
             counter++
@@ -145,7 +153,7 @@ export class Hive {
             lowLink.set(node, counter)
             let children = 0
             for (const n of this.neighbors(node)) {
-                if (n === parent) continue
+                if (parent && HEX.hex_compare(n, parent)) continue
                 if (visited.has(n)) lowLink.set(node, Math.min(lowLink.get(node), index.get(n)))
                 else {
                     dfs(n, node, counter)
@@ -170,21 +178,24 @@ export class Hive {
             GRASSHOPPER: this.generateJumps,
             BEETLE: this.generateClimbs
         }
+        console.log("Generating moves for")
         console.log(this.at(hex).insect)
-        console.log(moveMap[this.at(hex).insect].call(this, hex))
         return moveMap[this.at(hex).insect].call(this, hex)
     }
 
     generateMoves(team) {
         let result = []
+        console.log("Generating moves...")
         const articulation_points = this._oneHive()
+        console.log("Calculating articulation points")
+        // console.log(articulation_points)
         for (const hex of this.map.keys()) {
             if (this.at(hex).team === team) {
                 if (this.height(hex) > 1 || !articulation_points.has(hex)) {
-                    for (const dest of this.generateMovesFrom(hex)) {
+                    this.generateMovesFrom(hex).forEach((dest) => {
                         console.log([hex, dest])
                         result.push([hex, dest])
-                    }
+                    })
                 }
             }
         }
